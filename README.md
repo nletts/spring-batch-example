@@ -5,3 +5,11 @@ To run:
 ```
 gradle execute
 ```
+
+##Implemented
+* Annotation configuration
+* Spring Hibernate Validation framework
+
+##Unimplemented
+* Unit tests
+* Integration testing with HSQL DB
