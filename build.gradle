@@ -1,0 +1,31 @@
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'java'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.batch:spring-batch-core:3.0.2.RELEASE'
+    compile 'org.springframework:spring-core:4.1.2.RELEASE'
+    compile 'org.springframework:spring-jdbc:4.1.2.RELEASE'
+    compile 'org.hibernate:hibernate-validator:5.1.3.Final'
+    compile 'javax.el:javax.el-api:2.2.4' //Used for hibernate-validator lib
+    compile 'org.glassfish.web:javax.el:2.2.4' //Used for hibernate-validator lib
+    compile 'org.hsqldb:hsqldb:2.3.2'
+	compile 'org.slf4j:slf4j-log4j12:1.7.7'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.hamcrest:hamcrest-all:1.3'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
+
+task execute(type: JavaExec) {
+   main = 'org.springframework.batch.core.launch.support.CommandLineJobRunner'
+   classpath = sourceSets.main.runtimeClasspath
+   args = ['com.example.batch.TransportImportBatch', 'importUserJob']
+}
