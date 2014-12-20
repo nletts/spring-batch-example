@@ -27,5 +27,17 @@ task wrapper(type: Wrapper) {
 task execute(type: JavaExec) {
    main = 'org.springframework.batch.core.launch.support.CommandLineJobRunner'
    classpath = sourceSets.main.runtimeClasspath
-   args = ['com.example.batch.TransportImportBatch', 'importUserJob']
+   args = ['com.example.batch.TransportImportBatch', 'loadTransportJob']
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Spring Batch Example',
+                   'Implementation-Version': version,
+                   'Main-Class': 'org.springframework.batch.core.launch.support.CommandLineJobRunner'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }

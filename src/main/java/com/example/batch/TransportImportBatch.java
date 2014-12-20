@@ -83,8 +83,7 @@ public class TransportImportBatch {
     @Bean
     public ItemWriter<Transport> writer(DataSource dataSource) {
         JdbcBatchItemWriter<Transport> writer = new JdbcBatchItemWriter<Transport>();
-        // writer.setItemSqlParameterSourceProvider(new
-        // BeanPropertyItemSqlParameterSourceProvider<Transport>());
+        // writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Transport>());
         // Use customer provider because of TransportType enum
         writer.setItemSqlParameterSourceProvider(new TransportItemSqlParameterSourceProvider());
         writer.setSql("INSERT INTO transport (transport_type, make, model, year, odometer_reading) "
@@ -99,8 +98,8 @@ public class TransportImportBatch {
     }
 
     @Bean
-    public Job importUserJob(JobBuilderFactory jobs, Step s1) {
-        return jobs.get("importUserJob")
+    public Job loadTransportJob(JobBuilderFactory jobs, Step s1) {
+        return jobs.get("loadTransportJob")
                 .incrementer(new RunIdIncrementer())
                 .flow(s1)
                 .end()
