@@ -14,10 +14,8 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.support.CompositeItemProcessor;
@@ -30,7 +28,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 
 import com.example.batch.config.StandaloneInfrastructureConfiguration;
-import com.example.batch.domain.Transport;
+import com.example.batch.model.Transport;
+import com.example.batch.model.mapper.TransportFieldMapper;
+import com.example.batch.model.mapper.TransportItemSqlParameterSourceProvider;
 import com.example.batch.processor.TransportItemProcessor;
 import com.example.batch.validator.BeanValidator;
 
@@ -38,20 +38,26 @@ import com.example.batch.validator.BeanValidator;
 @EnableBatchProcessing
 @Import(StandaloneInfrastructureConfiguration.class)
 public class TransportImportBatch {
-	
-    // tag::readerwriterprocessor[]
+
     @Bean
     public ItemReader<Transport> reader() {
         FlatFileItemReader<Transport> reader = new FlatFileItemReader<Transport>();
         reader.setResource(new ClassPathResource("sample-data.csv"));
-        reader.setLineMapper(new DefaultLineMapper<Transport>() {{
-            setLineTokenizer(new DelimitedLineTokenizer() {{
-                setNames(new String[] { "transportType", "make", "model", "year", "odometerReading" });
-            }});
-            setFieldSetMapper(new BeanWrapperFieldSetMapper<Transport>() {{
-                setTargetType(Transport.class);
-            }});
-        }});
+        reader.setLineMapper(new DefaultLineMapper<Transport>() {
+            {
+                setLineTokenizer(new DelimitedLineTokenizer() {
+                    {
+                        setNames(new String[] { "transportType", "make", "model", "year", "odometerReading" });
+                    }
+                });
+                /*
+                 * setFieldSetMapper(new BeanWrapperFieldSetMapper<Transport>()
+                 * {{ setTargetType(Transport.class); }});
+                 */
+                // Use customer mapper because of TransportType enum
+                setFieldSetMapper(new TransportFieldMapper());
+            }
+        });
 
         return reader;
     }
@@ -62,7 +68,8 @@ public class TransportImportBatch {
         validatingProcessor.setValidator(itemValidator);
         TransportItemProcessor personProcessor = new TransportItemProcessor();
 
-        CompositeItemProcessor<Transport, Transport> compositeProcessor = new CompositeItemProcessor<Transport, Transport>();
+        CompositeItemProcessor<Transport, Transport> compositeProcessor =
+                new CompositeItemProcessor<Transport, Transport>();
 
         List<ItemProcessor<Transport, Transport>> itemProcessors = new ArrayList<ItemProcessor<Transport, Transport>>();
         itemProcessors.add(validatingProcessor);
@@ -76,9 +83,12 @@ public class TransportImportBatch {
     @Bean
     public ItemWriter<Transport> writer(DataSource dataSource) {
         JdbcBatchItemWriter<Transport> writer = new JdbcBatchItemWriter<Transport>();
-        writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Transport>());
+        // writer.setItemSqlParameterSourceProvider(new
+        // BeanPropertyItemSqlParameterSourceProvider<Transport>());
+        // Use customer provider because of TransportType enum
+        writer.setItemSqlParameterSourceProvider(new TransportItemSqlParameterSourceProvider());
         writer.setSql("INSERT INTO transport (transport_type, make, model, year, odometer_reading) "
-        			+ "VALUES (:transportType, :make, :model, :year, :odometerReading)");
+                + "VALUES (:transportType, :make, :model, :year, :odometerReading)");
         writer.setDataSource(dataSource);
         return writer;
     }
@@ -87,9 +97,7 @@ public class TransportImportBatch {
     public Validator<Transport> itemValidator() {
         return new BeanValidator<Transport>();
     }
-    // end::readerwriterprocessor[]
 
-    // tag::jobstep[]
     @Bean
     public Job importUserJob(JobBuilderFactory jobs, Step s1) {
         return jobs.get("importUserJob")
@@ -111,6 +119,5 @@ public class TransportImportBatch {
                 .writer(writer)
                 .build();
     }
-    // end::jobstep[]
 
 }

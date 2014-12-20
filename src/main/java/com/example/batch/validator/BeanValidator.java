@@ -1,6 +1,5 @@
 package com.example.batch.validator;
 
-
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.InitializingBean;
@@ -11,28 +10,28 @@ import javax.validation.ValidatorFactory;
 import java.util.Set;
 
 public class BeanValidator<T> implements Validator<T>, InitializingBean {
-	
-	private javax.validation.Validator validator;
+
+    private javax.validation.Validator validator;
 
     @Override
-	public void afterPropertiesSet() throws Exception {
-		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+    public void afterPropertiesSet() throws Exception {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.usingContext().getValidator();
-	}
+    }
 
     @Override
     public void validate(T target) throws ValidationException {
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(target);
 
-        if(constraintViolations.size() > 0) {
+        if (constraintViolations.size() > 0) {
             buildValidationException(constraintViolations);
         }
     }
 
-    private void buildValidationException (Set<ConstraintViolation<T>> constraintViolations) {
+    private void buildValidationException(Set<ConstraintViolation<T>> constraintViolations) {
         StringBuilder message = new StringBuilder();
 
-        for(ConstraintViolation<T> constraintViolation: constraintViolations) {
+        for (ConstraintViolation<T> constraintViolation : constraintViolations) {
             message.append(constraintViolation.getMessage() + "\n");
         }
 
