@@ -1,5 +1,5 @@
 #Spring Batch Example
-A collection of code from me learning Spring Batch (with annotations)
+A collection of code from me learning Spring Batch (with annotations). I deliberately chose not to use spring boot, as I prefer to do my own configuration and setup when learning.
 
 ##Build and run:
 ```
@@ -41,5 +41,4 @@ ____
 * Unit tests + coverage
 
 ###Nice to have
-
-* Integration testing with HSQL DB
+* Integration testing with HSQL DB and Spring Profiles
