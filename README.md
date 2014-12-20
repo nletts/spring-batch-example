@@ -20,13 +20,15 @@ gradle fatJar
 java -jar build/libs/spring-batch-example-all-1.0.0.jar com.example.batch.TransportImportBatch loadTransportJob
 ```
 
+____
 
 ##Scope Detail
 ###Implemented
 * Annotation configuration
 * Spring Hibernate Validation framework
+* Custom field mappers for beans with Enums
 * Run from Jar
 
-###Unimplemented
+###Nice to have
 * Unit tests
 * Integration testing with HSQL DB
