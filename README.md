@@ -1,5 +1,5 @@
 #Spring Batch Example
-A collection of code from me learning Spring Batch (with annotations). I deliberately chose not to use spring boot, as I prefer to do my own configuration and setup when learning.
+A collection of code from me learning Spring Batch (with annotations). I deliberately chose not to use Spring Boot, as I prefer to do my own configuration and setup when learning.
 
 ##Build and run:
 ```
