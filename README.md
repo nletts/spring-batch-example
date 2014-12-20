@@ -20,6 +20,16 @@ gradle fatJar
 java -jar build/libs/spring-batch-example-all-1.0.0.jar com.example.batch.TransportImportBatch loadTransportJob
 ```
 
+##Unit test
+Includes jacoco test coverage report
+```
+gradle unitTest
+```
+Test reports will appear in the following dirs:
+```
+build/reports/tests/index.html
+build/reports/coverage/index.html
+```
 ____
 
 ##Scope Detail
@@ -28,7 +38,8 @@ ____
 * Spring Hibernate Validation framework
 * Custom field mappers for beans with Enums
 * Run from Jar
+* Unit tests + coverage
 
 ###Nice to have
-* Unit tests
+
 * Integration testing with HSQL DB

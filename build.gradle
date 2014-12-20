@@ -1,6 +1,7 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'java'
+apply plugin: 'jacoco'
 
 repositories {
     mavenLocal()
@@ -41,3 +42,23 @@ task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
+//Test coverage
+test {
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/unitTest.exec")
+        classDumpFile = file("$buildDir/jacoco/classpathdumps")
+        includes = ["**/processor/*"]
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/reports/coverage"
+    }
+}
+
+task unitTest(dependsOn: ['test', 'jacocoTestReport'])
