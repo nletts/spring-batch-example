@@ -1,14 +1,16 @@
 #Spring Batch Example
 A collection of code from me learning Spring Batch (with annotations)
 
-##Build and Run:
+##Build and run:
 ```
 gradle build
+```
 
+```
 gradle execute
 ```
 
-##Run from jar
+##Run from jar:
 Builds a jar containing all dependencies
 ```
 gradle fatJar
