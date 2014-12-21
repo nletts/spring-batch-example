@@ -3,8 +3,6 @@ package com.example.batch;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -22,12 +20,13 @@ import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 
-import com.example.batch.config.StandaloneInfrastructureConfiguration;
+import com.example.batch.config.DataConfig;
 import com.example.batch.model.Transport;
 import com.example.batch.model.mapper.TransportFieldMapper;
 import com.example.batch.model.mapper.TransportItemSqlParameterSourceProvider;
@@ -36,8 +35,11 @@ import com.example.batch.validator.BeanValidator;
 
 @Configuration
 @EnableBatchProcessing
-@Import(StandaloneInfrastructureConfiguration.class)
+@ComponentScan(value={"com.example.batch.config"})
 public class TransportImportBatch {
+    
+    @Autowired
+    DataConfig dataConfig;
 
     @Bean
     public ItemReader<Transport> reader() {
@@ -81,14 +83,14 @@ public class TransportImportBatch {
     }
 
     @Bean
-    public ItemWriter<Transport> writer(DataSource dataSource) {
+    public ItemWriter<Transport> writer() {
         JdbcBatchItemWriter<Transport> writer = new JdbcBatchItemWriter<Transport>();
         // writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Transport>());
         // Use customer provider because of TransportType enum
         writer.setItemSqlParameterSourceProvider(new TransportItemSqlParameterSourceProvider());
         writer.setSql("INSERT INTO transport (transport_type, make, model, year, odometer_reading) "
                 + "VALUES (:transportType, :make, :model, :year, :odometerReading)");
-        writer.setDataSource(dataSource);
+        writer.setDataSource(dataConfig.dataSource());
         return writer;
     }
 

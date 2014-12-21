@@ -2,17 +2,15 @@ package com.example.batch.config;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-
-
 @Configuration
-@EnableBatchProcessing
-public class StandaloneInfrastructureConfiguration implements InfrastructureConfiguration {
+@Profile("default")
+public class StandaloneDataConfig implements DataConfig {
      
     @Bean
     public DataSource dataSource() {
