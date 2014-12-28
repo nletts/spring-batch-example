@@ -39,7 +39,7 @@ import com.example.batch.validator.BeanValidator;
 public class TransportImportBatch {
     
     @Autowired
-    DataConfig dataConfig;
+    private DataConfig dataConfig;
 
     @Bean
     public ItemReader<Transport> reader() {
@@ -52,7 +52,7 @@ public class TransportImportBatch {
                         setNames(new String[] { "transportType", "make", "model", "year", "odometerReading" });
                     }
                 });
-                /*
+                /* This is how to do it if not using a custom mapper:
                  * setFieldSetMapper(new BeanWrapperFieldSetMapper<Transport>()
                  * {{ setTargetType(Transport.class); }});
                  */
@@ -102,6 +102,7 @@ public class TransportImportBatch {
     @Bean
     public Job loadTransportJob(JobBuilderFactory jobs, Step s1) {
         return jobs.get("loadTransportJob")
+                .preventRestart()
                 .incrementer(new RunIdIncrementer())
                 .flow(s1)
                 .end()
