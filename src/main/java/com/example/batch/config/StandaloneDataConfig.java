@@ -11,16 +11,18 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 @Configuration
 @Profile("default")
 public class StandaloneDataConfig implements DataConfig {
-     
+
     @Bean
     public DataSource dataSource() {
         EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
         return embeddedDatabaseBuilder
-        		.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
+                .addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
                 .addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
                 .addScript("classpath:schema-transport.sql")
                 .setType(EmbeddedDatabaseType.HSQL)
+                .setName("prodDB")
                 .build();
+
     }
- 
+
 }

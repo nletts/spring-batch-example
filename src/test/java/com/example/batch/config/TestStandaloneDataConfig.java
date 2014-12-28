@@ -19,7 +19,9 @@ public class TestStandaloneDataConfig implements DataConfig {
                 .addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
                 .addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
                 .setType(EmbeddedDatabaseType.HSQL)
+                .setName("unitTestDB")
                 .build();
+
     }
 
 }
