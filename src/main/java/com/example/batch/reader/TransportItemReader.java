@@ -18,6 +18,7 @@ public class TransportItemReader implements ItemReader<Transport> {
 
     private FlatFileItemReader<Transport> reader;
 
+    //Needed if reading from the job parameters (in this case 'fileName')
     @BeforeStep
     public void initializeState(StepExecution stepExecution) {
         reader = new FlatFileItemReader<Transport>();

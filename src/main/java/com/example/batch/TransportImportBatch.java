@@ -9,6 +9,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -83,6 +84,7 @@ public class TransportImportBatch {
     @Bean
     public Job loadTransportJob(JobBuilderFactory jobs, Step s1) {
         return jobs.get("loadTransportJob")
+                .validator(new DefaultJobParametersValidator(new String[]{"fileName"}, new String[]{}))
                 .preventRestart()
                 .incrementer(new RunIdIncrementer())
                 .flow(s1)
