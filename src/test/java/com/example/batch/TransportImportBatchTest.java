@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -31,18 +32,24 @@ public class TransportImportBatchTest {
     
     @Autowired
     private DataConfig dataConfig;
+    
+    private JobParametersBuilder jobParametersBuilder;
 
     @Before
     public void setUp() throws Exception {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(new ClassPathResource("schema-transport.sql"));
         populator.populate(dataConfig.dataSource().getConnection());
+        
+        jobParametersBuilder = new JobParametersBuilder();
     }
 
     @Test
     public void test() throws Exception {
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        jobParametersBuilder.addString("fileName", "sample-data.csv");
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParametersBuilder.toJobParameters());
         assertThat(ExitStatus.COMPLETED, equalTo(jobExecution.getExitStatus()));
     }
 

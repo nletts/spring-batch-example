@@ -8,14 +8,12 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
@@ -24,44 +22,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
 import com.example.batch.config.DataConfig;
 import com.example.batch.model.Transport;
-import com.example.batch.model.mapper.TransportFieldMapper;
 import com.example.batch.model.mapper.TransportItemSqlParameterSourceProvider;
 import com.example.batch.processor.TransportItemProcessor;
+import com.example.batch.reader.TransportItemReader;
 import com.example.batch.validator.BeanValidator;
 
 @Configuration
 @EnableBatchProcessing
-@ComponentScan(value={"com.example.batch.config"})
+@ComponentScan(value = { "com.example.batch.config" })
 public class TransportImportBatch {
-    
+
     @Autowired
     private DataConfig dataConfig;
 
     @Bean
-    public ItemReader<Transport> reader() {
-        FlatFileItemReader<Transport> reader = new FlatFileItemReader<Transport>();
-        reader.setResource(new ClassPathResource("sample-data.csv"));
-        reader.setLineMapper(new DefaultLineMapper<Transport>() {
-            {
-                setLineTokenizer(new DelimitedLineTokenizer() {
-                    {
-                        setNames(new String[] { "transportType", "make", "model", "year", "odometerReading" });
-                    }
-                });
-                /* This is how to do it if not using a custom mapper:
-                 * setFieldSetMapper(new BeanWrapperFieldSetMapper<Transport>()
-                 * {{ setTargetType(Transport.class); }});
-                 */
-                // Use customer mapper because of TransportType enum
-                setFieldSetMapper(new TransportFieldMapper());
-            }
-        });
-
-        return reader;
+    @StepScope
+    public TransportItemReader reader() {
+        return new TransportItemReader();
     }
 
     @Bean
@@ -85,7 +65,8 @@ public class TransportImportBatch {
     @Bean
     public ItemWriter<Transport> writer() {
         JdbcBatchItemWriter<Transport> writer = new JdbcBatchItemWriter<Transport>();
-        // writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Transport>());
+        // writer.setItemSqlParameterSourceProvider(new
+        // BeanPropertyItemSqlParameterSourceProvider<Transport>());
         // Use customer provider because of TransportType enum
         writer.setItemSqlParameterSourceProvider(new TransportItemSqlParameterSourceProvider());
         writer.setSql("INSERT INTO transport (transport_type, make, model, year, odometer_reading) "
